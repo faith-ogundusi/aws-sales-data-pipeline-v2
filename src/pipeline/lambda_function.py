@@ -1,9 +1,11 @@
 """
 AWS Lambda entry point for the AWS Sales Data Pipeline V2.
 
-The Lambda function coordinates validation and processing
-of individual sales records.
+The Lambda function coordinates S3 event handling,
+validation, and processing of sales records.
 """
+
+from urllib.parse import unquote_plus
 
 from src.pipeline.processor import process_record
 from src.pipeline.validator import validate_record
@@ -17,8 +19,8 @@ def process_sales_record(record):
         record (dict): Raw sales record.
 
     Returns:
-        dict: Processed record with validation status,
-        or rejected record with a rejection reason.
+        dict: Processed valid record or rejected record
+        with a rejection reason.
     """
 
     validation_result = validate_record(record)
@@ -33,15 +35,38 @@ def process_sales_record(record):
     return process_record(record)
 
 
+def get_s3_object_details(event):
+    """
+    Extract the S3 bucket and object key from an S3 event.
+
+    Args:
+        event (dict): S3 event notification.
+
+    Returns:
+        tuple: Bucket name and object key.
+    """
+
+    record = event["Records"][0]
+    bucket = record["s3"]["bucket"]["name"]
+    key = unquote_plus(record["s3"]["object"]["key"])
+
+    return bucket, key
+
+
 def lambda_handler(event, context):
     """
     AWS Lambda entry point.
 
-    The S3 event integration will be implemented
-    in a later stage.
+    Extracts S3 object information from the event.
     """
+
+    bucket, key = get_s3_object_details(event)
+
+    print(f"Processing file: s3://{bucket}/{key}")
 
     return {
         "statusCode": 200,
-        "body": "Sales pipeline Lambda is ready."
+        "bucket": bucket,
+        "key": key,
+        "message": "S3 event received successfully."
     }
