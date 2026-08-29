@@ -10,6 +10,7 @@ from urllib.parse import unquote_plus
 from src.pipeline.processor import process_record
 from src.pipeline.validator import validate_record
 from src.pipeline.s3_reader import read_csv_from_s3
+from src.pipeline.s3_writer import write_csv_to_s3
 
 
 def process_sales_record(record):
@@ -81,7 +82,8 @@ def lambda_handler(event, context):
     """
     AWS Lambda entry point.
 
-    Reads a CSV file from S3 and processes its records.
+    Reads a CSV file from S3, processes its records,
+    and writes valid and rejected records back to S3.
     """
 
     bucket, key = get_s3_object_details(event)
@@ -95,11 +97,29 @@ def lambda_handler(event, context):
     print(f"Valid records: {len(valid_records)}")
     print(f"Rejected records: {len(rejected_records)}")
 
+    output_prefix = key.rsplit("/", 1)[0]
+
+    valid_key = f"{output_prefix}/valid_sales.csv"
+    rejected_key = f"{output_prefix}/rejected_sales.csv"
+
+    write_csv_to_s3(
+        bucket,
+        valid_key,
+        valid_records
+    )
+
+    write_csv_to_s3(
+        bucket,
+        rejected_key,
+        rejected_records
+    )
+
     return {
         "statusCode": 200,
         "bucket": bucket,
-        "key": key,
+        "source_key": key,
         "valid_records": len(valid_records),
         "rejected_records": len(rejected_records),
+        "valid_output": valid_key,
+        "rejected_output": rejected_key,
     }
-    
