@@ -1,15 +1,32 @@
 """
 Data processing module for the AWS Sales Data Pipeline V2.
 
-This module will contain the transformation and processing
-logic used after sales records are received.
+This module contains transformation logic applied to
+validated sales records.
 """
 
 
 def process_record(record):
     """
-    Process a validated sales record.
+    Transform a validated sales record.
 
-    Transformation logic will be implemented here.
+    Adds a calculated Revenue field and ensures numeric
+    values are stored consistently.
+
+    Args:
+        record (dict): A validated sales record.
+
+    Returns:
+        dict: The transformed sales record.
     """
-    pass
+
+    processed_record = record.copy()
+
+    quantity = float(processed_record["Quantity"])
+    unit_price = float(processed_record["UnitPrice"])
+
+    processed_record["Quantity"] = quantity
+    processed_record["UnitPrice"] = unit_price
+    processed_record["Revenue"] = round(quantity * unit_price, 2)
+
+    return processed_record
