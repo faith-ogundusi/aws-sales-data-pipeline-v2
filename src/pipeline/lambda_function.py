@@ -9,6 +9,7 @@ from urllib.parse import unquote_plus
 
 from src.pipeline.processor import process_record
 from src.pipeline.validator import validate_record
+from src.pipeline.s3_reader import read_csv_from_s3
 
 
 def process_sales_record(record):
@@ -52,21 +53,53 @@ def get_s3_object_details(event):
 
     return bucket, key
 
+def process_records(records):
+    """
+    Validate and process a collection of sales records.
+
+    Args:
+        records (list): Sales records read from the source CSV.
+
+    Returns:
+        tuple: Lists containing valid and rejected records.
+    """
+
+    valid_records = []
+    rejected_records = []
+
+    for record in records:
+        result = process_sales_record(record)
+
+        if result["ValidationStatus"] == "VALID":
+            valid_records.append(result)
+        else:
+            rejected_records.append(result)
+
+    return valid_records, rejected_records
 
 def lambda_handler(event, context):
     """
     AWS Lambda entry point.
 
-    Extracts S3 object information from the event.
+    Reads a CSV file from S3 and processes its records.
     """
 
     bucket, key = get_s3_object_details(event)
 
     print(f"Processing file: s3://{bucket}/{key}")
 
+    records = read_csv_from_s3(bucket, key)
+
+    valid_records, rejected_records = process_records(records)
+
+    print(f"Valid records: {len(valid_records)}")
+    print(f"Rejected records: {len(rejected_records)}")
+
     return {
         "statusCode": 200,
         "bucket": bucket,
         "key": key,
-        "message": "S3 event received successfully."
+        "valid_records": len(valid_records),
+        "rejected_records": len(rejected_records),
     }
+    
