@@ -17,30 +17,49 @@ def validate_record(record):
     Validate a single sales record.
 
     Returns:
-        True if the record passes all validation rules.
-        False if the record fails any validation rule.
+        dict: Validation result containing:
+            - is_valid: True or False
+            - reason: None when valid, otherwise the rejection reason
     """
 
     if not record:
-        return False
+        return {
+            "is_valid": False,
+            "reason": "Record is empty",
+        }
 
-    # Check that all required fields exist and contain values.
+    # Check required fields.
     for field in REQUIRED_FIELDS:
         if field not in record or record[field] in (None, ""):
-            return False
+            return {
+                "is_valid": False,
+                "reason": f"{field} is missing",
+            }
 
     # Validate numeric fields.
     try:
         quantity = float(record["Quantity"])
         unit_price = float(record["UnitPrice"])
     except (TypeError, ValueError):
-        return False
+        return {
+            "is_valid": False,
+            "reason": "Quantity and UnitPrice must be numeric",
+        }
 
     # Business validation rules.
     if quantity <= 0:
-        return False
+        return {
+            "is_valid": False,
+            "reason": "Quantity must be greater than zero",
+        }
 
     if unit_price <= 0:
-        return False
+        return {
+            "is_valid": False,
+            "reason": "UnitPrice must be greater than zero",
+        }
 
-    return True
+    return {
+        "is_valid": True,
+        "reason": None,
+    }
