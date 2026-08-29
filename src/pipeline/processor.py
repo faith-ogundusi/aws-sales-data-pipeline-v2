@@ -10,8 +10,7 @@ def process_record(record):
     """
     Transform a validated sales record.
 
-    Adds a calculated Revenue field and ensures numeric
-    values are stored consistently.
+    Adds calculated revenue and validation status.
 
     Args:
         record (dict): A validated sales record.
@@ -28,5 +27,6 @@ def process_record(record):
     processed_record["Quantity"] = quantity
     processed_record["UnitPrice"] = unit_price
     processed_record["Revenue"] = round(quantity * unit_price, 2)
+    processed_record["ValidationStatus"] = "VALID"
 
     return processed_record
