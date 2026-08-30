@@ -54,6 +54,7 @@ def get_s3_object_details(event):
 
     return bucket, key
 
+
 def process_records(records):
     """
     Validate and process a collection of sales records.
@@ -78,6 +79,7 @@ def process_records(records):
 
     return valid_records, rejected_records
 
+
 def lambda_handler(event, context):
     """
     AWS Lambda entry point.
@@ -97,11 +99,11 @@ def lambda_handler(event, context):
     print(f"Valid records: {len(valid_records)}")
     print(f"Rejected records: {len(rejected_records)}")
 
-filename = key.rsplit("/", 1)[-1]
-base_name = filename.rsplit(".", 1)[0]
+    filename = key.rsplit("/", 1)[-1]
+    base_name = filename.rsplit(".", 1)[0]
 
-valid_key = f"valid/{base_name}_valid_sales.csv"
-rejected_key = f"rejected/{base_name}_rejected_sales.csv"
+    valid_key = f"valid/{base_name}_valid_sales.csv"
+    rejected_key = f"rejected/{base_name}_rejected_sales.csv"
 
     write_csv_to_s3(
         bucket,
