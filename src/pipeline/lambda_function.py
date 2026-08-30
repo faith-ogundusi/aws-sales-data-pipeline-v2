@@ -97,8 +97,11 @@ def lambda_handler(event, context):
     print(f"Valid records: {len(valid_records)}")
     print(f"Rejected records: {len(rejected_records)}")
 
-    valid_key = "valid/valid_sales.csv"
-    rejected_key = "rejected/rejected_sales.csv"
+filename = key.rsplit("/", 1)[-1]
+base_name = filename.rsplit(".", 1)[0]
+
+valid_key = f"valid/{base_name}_valid_sales.csv"
+rejected_key = f"rejected/{base_name}_rejected_sales.csv"
 
     write_csv_to_s3(
         bucket,
