@@ -94,11 +94,11 @@ def lambda_handler(event, context):
 
     valid_records, rejected_records = process_records(records)
 
-    print(f"Valid records: {len(valid_records)}")
+        print(f"Valid records: {len(valid_records)}")
     print(f"Rejected records: {len(rejected_records)}")
 
     valid_key = "valid/valid_sales.csv"
-rejected_key = "rejected/rejected_sales.csv"
+    rejected_key = "rejected/rejected_sales.csv"
 
     write_csv_to_s3(
         bucket,
