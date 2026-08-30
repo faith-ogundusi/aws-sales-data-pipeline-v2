@@ -6,11 +6,17 @@ validation, and processing of sales records.
 """
 
 from urllib.parse import unquote_plus
+import boto3
 
 from src.pipeline.processor import process_record
 from src.pipeline.validator import validate_record
 from src.pipeline.s3_reader import read_csv_from_s3
 from src.pipeline.s3_writer import write_csv_to_s3
+
+
+sns_client = boto3.client("sns")
+
+SNS_TOPIC_ARN = "arn:aws:sns:us-east-1:393323650794:sales-pipeline-v2-alerts"
 
 
 def process_sales_record(record):
@@ -80,6 +86,18 @@ def process_records(records):
     return valid_records, rejected_records
 
 
+def send_notification(message):
+    """
+    Send a notification through Amazon SNS.
+    """
+
+    sns_client.publish(
+        TopicArn=SNS_TOPIC_ARN,
+        Message=message,
+        Subject="AWS Sales Pipeline V2"
+    )
+    
+
 def lambda_handler(event, context):
     """
     AWS Lambda entry point.
@@ -115,6 +133,13 @@ def lambda_handler(event, context):
         bucket,
         rejected_key,
         rejected_records
+    )
+
+    send_notification(
+        f"Sales pipeline completed successfully.\n"
+        f"Source file: {key}\n"
+        f"Valid records: {len(valid_records)}\n"
+        f"Rejected records: {len(rejected_records)}"
     )
 
     return {
