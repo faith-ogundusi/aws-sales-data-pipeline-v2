@@ -14,8 +14,7 @@ from src.pipeline.s3_reader import read_csv_from_s3
 from src.pipeline.s3_writer import write_csv_to_s3
 
 
-sns_client = boto3.client("sns")
-
+sns_client = boto3.client("sns", region_name="us-east-1")
 SNS_TOPIC_ARN = "arn:aws:sns:us-east-1:393323650794:sales-pipeline-v2-alerts"
 
 
