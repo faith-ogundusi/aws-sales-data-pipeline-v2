@@ -50,6 +50,23 @@ def get_value(rows):
 
 def lambda_handler(event, context):
 
+    if event.get("requestContext", {}).get("http"):
+        response = s3.get_object(
+            Bucket=OUTPUT_BUCKET,
+            Key=DASHBOARD_KEY
+        )
+
+        dashboard_data = response["Body"].read().decode("utf-8")
+
+        return {
+            "statusCode": 200,
+            "headers": {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*"
+            },
+            "body": dashboard_data
+        }
+
     queries = {
         "total_processed": """
             SELECT
