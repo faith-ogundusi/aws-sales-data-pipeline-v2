@@ -8,8 +8,6 @@ validation, and processing of sales records.
 from urllib.parse import unquote_plus
 import boto3
 
-lambda_client = boto3.client("lambda")
-
 from src.pipeline.processor import process_record
 from src.pipeline.validator import validate_record
 from src.pipeline.s3_reader import read_csv_from_s3
@@ -143,7 +141,7 @@ def lambda_handler(event, context):
         f"Rejected records: {len(rejected_records)}"
     )
 
-    lambda_client.invoke(
+    boto3.client("lambda").invoke(
         FunctionName="sales-pipeline-v2-dashboard",
         InvocationType="Event"
     )
