@@ -30,7 +30,7 @@ def read_csv_from_s3(bucket, key):
         Key=key
     )
 
-    file_content = response["Body"].read().decode("utf-8")
+    file_content = response["Body"].read().decode("utf-8-sig")
 
     reader = csv.DictReader(io.StringIO(file_content))
 
