@@ -36,3 +36,16 @@ jobs:
         with:
           name: lambda-package
           path: lambda-package.zip
+
+      - name: Deploy Lambda function
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Update Lambda function
+        run: |
+          aws lambda update-function-code \
+            --function-name sales-pipeline-v2-processor \
+            --zip-file fileb://lambda-package.zip
