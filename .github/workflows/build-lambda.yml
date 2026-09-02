@@ -1,4 +1,4 @@
-name: Build Lambda Package
+name: Build and Deploy Lambda Functions
 
 on:
   push:
@@ -22,30 +22,49 @@ jobs:
         run: |
           pip install -r requirements.txt -t package/
 
-      - name: Copy application code
+      - name: Copy processor application code
         run: |
           cp -r src package/
 
-      - name: Create Lambda package
+      - name: Create processor Lambda package
         run: |
           cd package
           zip -r ../lambda-package.zip .
 
-      - name: Upload Lambda package
+      - name: Upload processor Lambda package
         uses: actions/upload-artifact@v4
         with:
           name: lambda-package
           path: lambda-package.zip
 
-      - name: Deploy Lambda function
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Update Lambda function
+      - name: Deploy processor Lambda
         run: |
           aws lambda update-function-code \
             --function-name sales-pipeline-v2-processor \
             --zip-file fileb://lambda-package.zip
+
+      - name: Create dashboard Lambda package
+        run: |
+          mkdir dashboard-package
+          cp src/pipeline/dashboard/lambda_function.py dashboard-package/
+          cd dashboard-package
+          zip -r ../dashboard-lambda-package.zip .
+
+      - name: Upload dashboard Lambda package
+        uses: actions/upload-artifact@v4
+        with:
+          name: dashboard-lambda-package
+          path: dashboard-lambda-package.zip
+
+      - name: Deploy dashboard Lambda
+        run: |
+          aws lambda update-function-code \
+            --function-name sales-pipeline-v2-dashboard \
+            --zip-file fileb://dashboard-lambda-package.zip
