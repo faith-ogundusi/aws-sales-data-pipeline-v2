@@ -109,6 +109,17 @@ The pipeline was tested using a retail sales CSV containing **50,000 records**.
 | UnitPrice must be greater than zero | 212 |
 | **Total rejected** | **1,220** |
 
+### Scalability Test
+
+A ~40 MB CSV file was tested to evaluate the pipeline's behavior with a larger workload.
+
+- Memory: 512 MB
+- Timeout: Increased from 5 minutes to 15 minutes
+- Result: The Lambda function exceeded its available memory during processing.
+- Conclusion: Large CSV processing is a scalability limitation in V2.
+
+This limitation will be addressed in a future V3 iteration through more memory-efficient processing, such as chunked or streaming data processing.
+
 ## Sales Analytics
 
 The processed data is queried using Amazon Athena.
