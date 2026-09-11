@@ -169,6 +169,10 @@ The dashboard displays:
 
 The dashboard retrieves its data dynamically from AWS through an AWS Lambda Function URL.
 
+### Dashboard Preview
+
+![Sales KPI Dashboard](docs/screenshots/sales-kpi-dashboard.png)
+
 ## Automation
 
 The pipeline was designed to minimize manual intervention.
@@ -222,9 +226,13 @@ The project test workflow passed successfully during development.
     │       └── build-lambda.yml
     │
     ├── docs/
-    │   └── architecture/
+    │   ├── architecture/
+    │   │   ├── README.md
+    │   │   └── aws-sales-data-pipeline-v2-architecture.png
+    │   │
+    │   └── screenshots/
     │       ├── README.md
-    │       └── aws-sales-data-pipeline-v2-architecture.png
+    │       └── sales-kpi-dashboard.png
     │
     ├── src/
     │   └── pipeline/
